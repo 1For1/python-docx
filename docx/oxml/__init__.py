@@ -25,8 +25,10 @@ def parse_xml(xml):
     parser is used, so custom element classes are produced for elements in
     *xml* that have them.
     """
-    root_element = etree.fromstring(xml, oxml_parser)
+    root_element = etree.fromstring(remove_hyperlink_tags(xml), oxml_parser)
     return root_element
+    #root_element = etree.fromstring(xml, oxml_parser)
+    #return root_element
 
 
 def register_element_cls(tag, cls):
@@ -39,6 +41,13 @@ def register_element_cls(tag, cls):
     namespace = element_class_lookup.get_namespace(nsmap[nspfx])
     namespace[tagroot] = cls
 
+# Newly added function to remove <hyberlink> tags
+def remove_hyperlink_tags(xml):
+    import re
+    text = xml.decode('utf-8')
+    text = text.replace("</w:hyperlink>","")
+    text = re.sub('<w:hyperlink[^>]*>', "", text)
+    return text.encode('utf-8')
 
 def OxmlElement(nsptag_str, attrs=None, nsdecls=None):
     """
